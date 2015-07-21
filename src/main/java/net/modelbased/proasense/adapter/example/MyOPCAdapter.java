@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.modelbased.proasense.adapter;
+package net.modelbased.proasense.adapter.example;
 
 import eu.proasense.internal.ComplexValue;
 import eu.proasense.internal.SimpleEvent;
@@ -45,7 +45,7 @@ import org.openscada.opc.lib.da.Server;
 import org.openscada.opc.lib.da.SyncAccess;
 
 
-public class OPCServerAdapterConsumer {
+public class MyOPCAdapter {
 
     public static void main(String[] args) throws Exception {
 
@@ -68,7 +68,7 @@ public class OPCServerAdapterConsumer {
             // add sync access, poll every 500 ms
             final AccessBase access = new SyncAccess(server, 500);
             access.addItem(itemId, new DataCallback() {
-                @Override
+//                @Override
                 public void changed(Item item, ItemState state) {
                     // also dump value
                     try {
@@ -95,7 +95,7 @@ public class OPCServerAdapterConsumer {
             ScheduledExecutorService writeThread = Executors.newSingleThreadScheduledExecutor();
             final AtomicInteger i = new AtomicInteger(0);
             writeThread.scheduleWithFixedDelay(new Runnable() {
-                @Override
+//                @Override
                 public void run() {
                     final JIVariant value = new JIVariant(i.incrementAndGet());
                     try {
@@ -116,85 +116,5 @@ public class OPCServerAdapterConsumer {
             System.out.println(String.format("%08X: %s", e.getErrorCode(), server.getErrorMessage(e.getErrorCode())));
         }
     }
-
-
-    private SimpleEvent convertToSimpleEvent(String input) {
-        // Input format: "{\"variable_type\":\"1002311\",\"value\":138.2346,\"variable_timestamp\":\"2014-02-14T07:01:24.133Z\"}";
-
-        input = input.replace("\"", "");
-        input = input.replace("{", "");
-        input = input.replace("variable_type:", "");
-        input = input.replace("value:", "");
-        input = input.replace("variable_timestamp:", "");
-        input = input.replace("}", "");
-
-        String[] parts = input.split(",");
-        System.out.println("parts[0] = " + parts[0]);
-        System.out.println("parts[1] = " + parts[1]);
-        System.out.println("parts[2] = " + parts[2]);
-
-        long timestamp = new DateTime(parts[2]).getMillis();
-        String sensorId = parts[0];
-
-        // Define complex value
-        ComplexValue value = new ComplexValue();
-        value.setValue(parts[1]);
-        value.setType(VariableType.LONG);
-
-        // Define measurement
-        Map<String, ComplexValue> measurement = new HashMap<String, ComplexValue>();
-        measurement.put("raw.value", value);
-
-        SimpleEvent event = new SimpleEvent();
-        event.setTimestamp(timestamp);
-        event.setSensorId(convertTagToSensorId(sensorId));
-        event.setEventProperties(measurement);
-
-        return event;
-    }
-
-
-    private Producer<String, String> createProducer(String a_zookeeper) {
-        // Specify producer properties
-        Properties props = new Properties();
-        props.put("metadata.broker.list", a_zookeeper);
-        props.put("serializer.class", "kafka.serializer.StringEncoder");
-        props.put("producer.type", "sync");
-        props.put("queue.enqueue.timeout.ms", "-1");
-        props.put("batch.num.messages", "200");
-        props.put("compression.codec", "1");
-        props.put("request.required.acks", 1);
-
-        ProducerConfig config = new ProducerConfig(props);
-
-        // Define the producer object
-        Producer<String, String> producer = new Producer<String, String>(config);
-
-        return producer;
-    }
-
-
-    private String convertTagToSensorId(String tag) {
-        String sensorId = "";
-
-        if(tag.matches("1000693"))
-            sensorId = "MHWirth.DDM.DrillingRPM";
-        else if(tag.matches("1000700"))
-            sensorId = "MHWirth.DDM.DrillingTorque";
-        else if(tag.matches("1002311"))
-            sensorId = "MHWirth.DDM.HookLoad";
-        else if(tag.matches("1000695"))
-            sensorId = "MHWirth.DDM.GearLubeOilTemp";
-        else if(tag.matches("1000692"))
-            sensorId = "MHWirth.DDM.GearBoxPressure";
-        else if(tag.matches("1000696"))
-            sensorId = "MHWirth.DDM.SwivelOilTemp";
-        else if(tag.matches("1002123"))
-            sensorId = "MHWirth.DrillBit.WeightOnBit";
-        else if(tag.matches("1033619"))
-            sensorId = "MHWirth.DrillBit.WeightOnBit";
-
-        return sensorId;
-    };
 
 }
