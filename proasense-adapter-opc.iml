@@ -13,7 +13,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: eu.proasense.internal:thrift-messages:0.4" level="project" />
-    <orderEntry type="library" name="Maven: com.github.SINTEF-9012:proasense-adapter-base:93c7eff5846a25d258c49f38de0afea6e886fcb3" level="project" />
+    <orderEntry type="library" name="Maven: com.github.SINTEF-9012:proasense-adapter-base:032d97c688c718ed2ba52c7006a61a30f9031f8f" level="project" />
     <orderEntry type="library" name="Maven: joda-time:joda-time:2.1" level="project" />
     <orderEntry type="library" name="Maven: com.github.jitpack:maven-simple:0.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.thrift:libthrift:0.9.2" level="project" />
